@@ -10,18 +10,16 @@ import java.util.UUID;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "account_type")
-public class AccountType {
+@Table(name = "credit_card_type")
+public class CreditCardType {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_type_sequence")
-    @SequenceGenerator(name = "account_type_sequence", sequenceName = "account_type_sequence_seq_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "credit_card_type_sequence")
+    @SequenceGenerator(name = "credit_card_type_sequence", sequenceName = "credit_card_type_sequence_seq_id")
     private Long id;
 
-    @Column(length = 100, nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
-
-    private boolean deleted;
 
     private boolean active;
 
