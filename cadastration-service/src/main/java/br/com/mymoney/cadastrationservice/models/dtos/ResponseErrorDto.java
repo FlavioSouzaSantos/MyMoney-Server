@@ -14,4 +14,8 @@ public class ResponseErrorDto {
         field = fieldError.getField();
         error = fieldError.getDefaultMessage();
     }
+
+    public ResponseErrorDto(String error) {
+        this.error = error;
+    }
 }

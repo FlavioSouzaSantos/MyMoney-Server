@@ -1,22 +1,33 @@
 package br.com.mymoney.cadastrationservice.services;
 
+import br.com.mymoney.cadastrationservice.exceptions.ResponseErrorException;
 import br.com.mymoney.cadastrationservice.exceptions.ValidationException;
+import br.com.mymoney.cadastrationservice.models.dtos.ResponseErrorDto;
 import br.com.mymoney.cadastrationservice.models.dtos.ResponsePageDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Validator;
 
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public abstract class CrudService<T,ID> {
 
-    protected final JpaRepository<T,ID> repository;
+    @Autowired protected JpaRepository<T,ID> repository;
+    @Autowired protected Validator  validator;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public Optional<T> create(Optional<T> entity) {
@@ -31,6 +42,18 @@ public abstract class CrudService<T,ID> {
         if(entityFields.isPresent() && id.isPresent() && repository.existsById(id.get())){
             Optional<T> to = repository.findById(id.get());
             updateFields(entityFields, to);
+
+            DataBinder binder = new DataBinder(to);
+            BindingResult bindingResult = binder.getBindingResult();
+            validator.validate(to, bindingResult);
+            if(bindingResult.hasErrors()){
+                Set<ResponseErrorDto> errors = bindingResult.getFieldErrors().stream()
+                        .map(ResponseErrorDto::new)
+                        .collect(Collectors.toSet());
+
+                throw new ResponseErrorException(errors);
+            }
+
             return Optional.ofNullable(repository.save(to.get()));
         }
         return Optional.empty();
@@ -55,7 +78,7 @@ public abstract class CrudService<T,ID> {
     }
 
     @Transactional(readOnly = true)
-    public Optional<ResponsePageDto<T>> findAll(int page, int size, String[] order, String direction) {
+    public Optional<ResponsePageDto<T>> findAll(Specification<T> specification, int page, int size, String[] order, String direction) {
         PageRequest pageRequest;
         if(order != null && order.length > 0){
             pageRequest = PageRequest.of(page, size, Sort.Direction.fromString(direction), order);
@@ -63,7 +86,13 @@ public abstract class CrudService<T,ID> {
             pageRequest = PageRequest.of(page, size);
         }
 
-        Page<T> pageResult = repository.findAll(pageRequest);
+        Page<T> pageResult;
+        if(specification != null && repository instanceof JpaSpecificationExecutor){
+            pageResult = ((JpaSpecificationExecutor) repository).findAll(specification, pageRequest);
+        }else{
+            pageResult = repository.findAll(pageRequest);
+        }
+
         return Optional.of(new ResponsePageDto(pageResult));
     }
 

@@ -25,8 +25,6 @@ public class AccountType {
     @Column(length = 100, nullable = false)
     private String name;
 
-    private boolean deleted;
-
     private boolean active = true;
 
     @Column(nullable = false, updatable = false)

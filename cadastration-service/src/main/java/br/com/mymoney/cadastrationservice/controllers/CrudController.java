@@ -4,7 +4,7 @@ import br.com.mymoney.cadastrationservice.exceptions.ResponseErrorException;
 import br.com.mymoney.cadastrationservice.models.dtos.ResponseErrorDto;
 import br.com.mymoney.cadastrationservice.models.dtos.ResponsePageDto;
 import br.com.mymoney.cadastrationservice.services.CrudService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +15,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 public abstract class CrudController<T,ID> {
 
-    protected final CrudService<T,ID> crudService;
+    @Autowired protected CrudService<T,ID> crudService;
 
     @PostMapping
     public ResponseEntity<T> create(@Valid @RequestBody T entity, BindingResult bindingResult) throws ResponseErrorException {
@@ -62,9 +61,9 @@ public abstract class CrudController<T,ID> {
     @GetMapping
     public ResponseEntity<ResponsePageDto<T>> findAll(@RequestParam(name = "page", defaultValue = "1") int page,
                                                       @RequestParam(name = "size", defaultValue = "30") int size,
-                                                      @RequestParam(name = "order") String[] order,
+                                                      @RequestParam(name = "order", required = false) String[] order,
                                                       @RequestParam(name = "direction", defaultValue = "ASC") String direction) {
-        return crudService.findAll(page, size, order, direction)
+        return crudService.findAll(null, page, size, order, direction)
                 .map(record -> ResponseEntity.ok(record))
                 .orElse(ResponseEntity.badRequest().build());
     }

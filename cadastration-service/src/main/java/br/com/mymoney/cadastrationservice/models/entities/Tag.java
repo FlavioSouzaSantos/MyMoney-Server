@@ -25,8 +25,6 @@ public class Tag {
     @Column(nullable = false, length = 100)
     private String name;
 
-    private boolean deleted;
-
     private boolean active = true;
 
     @Column(nullable = false)

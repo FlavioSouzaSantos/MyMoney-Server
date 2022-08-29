@@ -46,9 +46,7 @@ public class CreditCard {
     @NotNull(message = "{validation.model.CreditCard.limit.NotNull}")
     @DecimalMin(value = "0.1", message = "{validation.model.CreditCard.limit.DecimalMin}")
     @Column(nullable = false, precision = 2)
-    private Double limit;
-
-    private boolean deleted;
+    private Double limitValue;
 
     private boolean active=true;
 
