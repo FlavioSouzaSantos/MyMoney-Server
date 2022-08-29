@@ -30,8 +30,6 @@ public class Category {
     @JoinColumn(name = "id_parent", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_category__parent"))
     private Category parent;
 
-    private boolean deleted;
-
     private boolean active;
 
     @Column(nullable = false)

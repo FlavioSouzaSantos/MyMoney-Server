@@ -34,8 +34,6 @@ public class Account {
     @Column(precision = 2)
     private Double initialValue;
 
-    private boolean deleted;
-
     @Column(nullable = false)
     private UUID userId;
 
