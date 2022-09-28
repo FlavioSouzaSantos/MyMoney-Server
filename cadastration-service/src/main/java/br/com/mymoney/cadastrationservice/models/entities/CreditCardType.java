@@ -1,16 +1,20 @@
 package br.com.mymoney.cadastrationservice.models.entities;
 
+import br.com.mymoney.cadastrationservice.models.listerners.BaseEntityListener;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 
 @Entity
 @Table(name = "credit_card_type")
+@EntityListeners(BaseEntityListener.class)
 public class CreditCardType extends BaseEntity<Long> {
 
     @Id
@@ -23,4 +27,9 @@ public class CreditCardType extends BaseEntity<Long> {
     private String name;
 
     private boolean active = true;
+
+    @Column(nullable = false, updatable = false)
+    private UUID uuid;
+
+    private LocalDateTime lastUpdate;
 }

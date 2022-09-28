@@ -1,11 +1,13 @@
 package br.com.mymoney.cadastrationservice.models.entities;
 
+import br.com.mymoney.cadastrationservice.models.listerners.BaseEntityListener;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -13,6 +15,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "account")
+@EntityListeners(BaseEntityListener.class)
 public class Account extends BaseEntity<Long> {
 
     @Id
@@ -34,6 +37,11 @@ public class Account extends BaseEntity<Long> {
 
     @Column(nullable = false)
     private UUID userId;
+
+    @Column(nullable = false, updatable = false)
+    protected UUID uuid;
+
+    protected LocalDateTime lastUpdate;
 
     private boolean syncRelease;
 }
