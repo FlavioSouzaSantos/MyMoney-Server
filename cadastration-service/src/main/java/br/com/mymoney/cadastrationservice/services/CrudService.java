@@ -4,8 +4,13 @@ import br.com.mymoney.cadastrationservice.exceptions.ResponseErrorException;
 import br.com.mymoney.cadastrationservice.exceptions.ValidationException;
 import br.com.mymoney.cadastrationservice.models.dtos.ResponseErrorDto;
 import br.com.mymoney.cadastrationservice.models.dtos.ResponsePageDto;
+import br.com.mymoney.cadastrationservice.models.entities.BaseEntity;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -18,16 +23,22 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Validator;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+@Log
 @RequiredArgsConstructor
-public abstract class CrudService<T,ID> {
+public abstract class CrudService<T extends BaseEntity<ID>, ID> {
 
     @Autowired protected JpaRepository<T,ID> repository;
     @Autowired protected Validator  validator;
+    @Autowired protected ObjectMapper objectMapper;
+    @Autowired protected MessageSource messageSource;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public Optional<T> create(Optional<T> entity) {
@@ -38,14 +49,13 @@ public abstract class CrudService<T,ID> {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Optional<T> update(Optional<HashMap<String, Object>> entityFields, Optional<ID> id) {
-        if(entityFields.isPresent() && id.isPresent() && repository.existsById(id.get())){
-            Optional<T> to = repository.findById(id.get());
-            updateFields(entityFields, to);
+    public Optional<T> fullUpdate(Optional<T> entity, Optional<ID> id) {
+        if(entity.isPresent() && id.isPresent() && repository.existsById(id.get())){
+            entity.get().setId(id.get());
 
-            DataBinder binder = new DataBinder(to);
+            DataBinder binder = new DataBinder(entity.get());
             BindingResult bindingResult = binder.getBindingResult();
-            validator.validate(to, bindingResult);
+            validator.validate(entity.get(), bindingResult);
             if(bindingResult.hasErrors()){
                 Set<ResponseErrorDto> errors = bindingResult.getFieldErrors().stream()
                         .map(ResponseErrorDto::new)
@@ -54,7 +64,35 @@ public abstract class CrudService<T,ID> {
                 throw new ResponseErrorException(errors);
             }
 
-            return Optional.ofNullable(repository.save(to.get()));
+            return Optional.ofNullable(repository.save(entity.get()));
+        }
+        return Optional.empty();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public Optional<T> partialUpdate(InputStream jsonBody, Optional<ID> id) {
+        if(jsonBody != null && id.isPresent() && repository.existsById(id.get())){
+            try{
+                Optional<T> tempEntity = repository.findById(id.get());
+                ObjectReader objectReader = objectMapper.readerForUpdating(tempEntity.get());
+                T entity = (T) objectReader.readValue(jsonBody);
+
+                DataBinder binder = new DataBinder(entity);
+                BindingResult bindingResult = binder.getBindingResult();
+                validator.validate(entity, bindingResult);
+                if(bindingResult.hasErrors()){
+                    Set<ResponseErrorDto> errors = bindingResult.getFieldErrors().stream()
+                            .map(ResponseErrorDto::new)
+                            .collect(Collectors.toSet());
+
+                    throw new ResponseErrorException(errors);
+                }
+
+                return Optional.ofNullable(repository.save(entity));
+            }catch (IOException ex){
+                log.log(Level.SEVERE, ex.getMessage(), ex);
+                throw new ResponseErrorException(Set.of(new ResponseErrorDto(messageSource.getMessage("error.deserialization.json", null, null))));
+            }
         }
         return Optional.empty();
     }
@@ -101,13 +139,6 @@ public abstract class CrudService<T,ID> {
      * @param entity Entidade a ser salva
      */
     protected void setDefaultValues(Optional<T> entity){}
-
-    /**
-     * Seta os fields que estão sendo alterados na entidade.
-     * @param from Fields a ser alterados
-     * @param to Entidade destino
-     */
-    protected abstract void updateFields(Optional<HashMap<String, Object>> from, Optional<T> to);
 
     /**
      * Valida se a entidade pode ser excluída.

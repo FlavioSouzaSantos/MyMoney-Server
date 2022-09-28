@@ -5,16 +5,13 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 
 @Entity
 @Table(name = "credit_card_type")
-public class CreditCardType {
+public class CreditCardType extends BaseEntity<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "credit_card_type_sequence")
@@ -26,18 +23,4 @@ public class CreditCardType {
     private String name;
 
     private boolean active = true;
-
-    @Column(nullable = false, updatable = false)
-    private UUID uuid;
-
-    private LocalDateTime lastUpdate;
-
-    private boolean syncRelease;
-
-    @PrePersist
-    @PreUpdate
-    public void preSave(){
-        if(uuid == null) uuid = UUID.randomUUID();
-        if(lastUpdate == null) lastUpdate = LocalDateTime.now(ZoneOffset.UTC);
-    }
 }
