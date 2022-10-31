@@ -25,7 +25,6 @@ import org.springframework.validation.Validator;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
@@ -36,7 +35,7 @@ import java.util.stream.Collectors;
 public abstract class CrudService<T extends BaseEntity<ID>, ID> {
 
     @Autowired protected JpaRepository<T,ID> repository;
-    @Autowired protected Validator  validator;
+    @Autowired protected Validator validator;
     @Autowired protected ObjectMapper objectMapper;
     @Autowired protected MessageSource messageSource;
 
@@ -52,6 +51,7 @@ public abstract class CrudService<T extends BaseEntity<ID>, ID> {
     public Optional<T> fullUpdate(Optional<T> entity, Optional<ID> id) {
         if(entity.isPresent() && id.isPresent() && repository.existsById(id.get())){
             entity.get().setId(id.get());
+            setDefaultValues(entity);
 
             DataBinder binder = new DataBinder(entity.get());
             BindingResult bindingResult = binder.getBindingResult();
@@ -74,6 +74,8 @@ public abstract class CrudService<T extends BaseEntity<ID>, ID> {
         if(jsonBody != null && id.isPresent() && repository.existsById(id.get())){
             try{
                 Optional<T> tempEntity = repository.findById(id.get());
+                setDefaultValues(tempEntity);
+
                 ObjectReader objectReader = objectMapper.readerForUpdating(tempEntity.get());
                 T entity = (T) objectReader.readValue(jsonBody);
 
@@ -116,7 +118,8 @@ public abstract class CrudService<T extends BaseEntity<ID>, ID> {
     }
 
     @Transactional(readOnly = true)
-    public Optional<ResponsePageDto<T>> findAll(Specification<T> specification, int page, int size, String[] order, String direction) {
+    public Optional<ResponsePageDto<T>> findAll(Specification<T> specification,
+                                                int page, int size, String[] order, String direction) {
         PageRequest pageRequest;
         if(order != null && order.length > 0){
             pageRequest = PageRequest.of(page, size, Sort.Direction.fromString(direction), order);

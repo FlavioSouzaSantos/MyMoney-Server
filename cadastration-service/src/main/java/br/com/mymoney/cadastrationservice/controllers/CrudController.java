@@ -8,7 +8,9 @@ import br.com.mymoney.cadastrationservice.services.CrudService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,13 +19,14 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Log
 public abstract class CrudController<T extends BaseEntity<ID>, ID> {
 
-    @Autowired protected CrudService<T,ID> crudService;
+    @Autowired protected CrudService<T, ID> crudService;
     @Autowired protected MessageSource messageSource;
 
     @PostMapping
@@ -79,12 +82,30 @@ public abstract class CrudController<T extends BaseEntity<ID>, ID> {
     }
 
     @GetMapping
-    public ResponseEntity<ResponsePageDto<T>> findAll(@RequestParam(name = "page", defaultValue = "0") int page,
+    public ResponseEntity<ResponsePageDto<T>> findAll(HttpServletRequest request,
+                                                      @RequestParam(name = "page", defaultValue = "0") int page,
                                                       @RequestParam(name = "size", defaultValue = "30") int size,
                                                       @RequestParam(name = "order", required = false) String[] order,
                                                       @RequestParam(name = "direction", defaultValue = "ASC") String direction) {
-        return crudService.findAll(null, page, size, order, direction)
+        return crudService.findAll(createDefaultSpecification(request), page, size, order, direction)
                 .map(record -> ResponseEntity.ok(record))
                 .orElse(ResponseEntity.badRequest().build());
+    }
+
+    /**
+     * Deve ser implementado quando se deseja ter um specification na consulta padrão do controller
+     * @param request A requisição atual feito pelo usuário.
+     * @return Um Specification do tipo da entidade com as regras desejada.
+     */
+    protected Specification<T> createDefaultSpecification(HttpServletRequest request){
+        return null;
+    }
+
+    protected Optional<UUID> getUUIDAuthenticated(){
+        String uuidStr = SecurityContextHolder.getContext().getAuthentication() != null
+                && SecurityContextHolder.getContext().getAuthentication().isAuthenticated()
+                ? SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()
+                : null;
+        return uuidStr != null ? Optional.of(UUID.fromString(uuidStr)) : Optional.empty();
     }
 }

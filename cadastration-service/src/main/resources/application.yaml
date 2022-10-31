@@ -11,3 +11,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+security:
+  jwt:
+    secret: x856@#$oIx754!!*&

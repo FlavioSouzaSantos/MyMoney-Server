@@ -1,11 +1,12 @@
 package br.com.mymoney.cadastrationservice.models.entities;
 
 import br.com.mymoney.cadastrationservice.models.listerners.BaseEntityListener;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class Tag extends BaseEntity<Long> {
     @SequenceGenerator(name = "tag_sequence", sequenceName = "tag_sequence_seq_id")
     private Long id;
 
-    @NotNull(message = "{validation.model.Tag.name.NotBlank}")
+    @NotBlank(message = "{validation.model.Tag.name.NotBlank}")
     @Column(nullable = false, length = 100)
     private String name;
 
@@ -36,6 +37,7 @@ public class Tag extends BaseEntity<Long> {
 
     private LocalDateTime lastUpdate;
 
+    @JsonIgnore
     private boolean syncRelease;
 
 
