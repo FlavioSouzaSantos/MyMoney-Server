@@ -16,6 +16,7 @@ import java.util.UUID;
 @Table(name = "credit_card")
 @EntityListeners(BaseEntityListener.class)
 public class CreditCard extends BaseEntity<Long> {
+    public static final String USER_ID = "userId";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "credit_card_sequence")

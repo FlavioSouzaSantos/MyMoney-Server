@@ -16,6 +16,7 @@ import java.util.UUID;
 @Table(name = "category")
 @EntityListeners(BaseEntityListener.class)
 public class Category extends BaseEntity<Long> {
+    public static final String USER_ID = "userId";
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_sequence")
