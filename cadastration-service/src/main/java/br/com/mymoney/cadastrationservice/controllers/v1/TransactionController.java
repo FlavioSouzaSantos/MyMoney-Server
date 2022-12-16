@@ -7,7 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 @RestController
@@ -15,6 +15,6 @@ import java.util.UUID;
 public class TransactionController extends CrudController<Transaction, Long> {
     @Override
     protected Specification<Transaction> createDefaultSpecification(HttpServletRequest request) {
-        return new FilterTransactionsByUserSpecification(getUUIDAuthenticated().orElse(UUID.randomUUID()));
+        return new FilterTransactionsByUserSpecification(getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
     }
 }

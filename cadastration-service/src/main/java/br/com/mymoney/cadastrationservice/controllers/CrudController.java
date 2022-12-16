@@ -5,17 +5,19 @@ import br.com.mymoney.cadastrationservice.models.dtos.ResponseErrorDto;
 import br.com.mymoney.cadastrationservice.models.dtos.ResponsePageDto;
 import br.com.mymoney.cadastrationservice.models.entities.BaseEntity;
 import br.com.mymoney.cadastrationservice.services.CrudService;
+import br.com.mymoney.cadastrationservice.utils.JWTUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
@@ -23,11 +25,16 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import static br.com.mymoney.cadastrationservice.filters.JWTAuthenticationFilter.BEARER;
+import static br.com.mymoney.cadastrationservice.filters.JWTAuthenticationFilter.EMPYT;
+
 @Log
 public abstract class CrudController<T extends BaseEntity<ID>, ID> {
 
     @Autowired protected CrudService<T, ID> crudService;
     @Autowired protected MessageSource messageSource;
+    @Value("${security.jwt.secret:}")
+    protected String secret;
 
     @PostMapping
     public ResponseEntity<T> create(@Valid @RequestBody T entity, BindingResult bindingResult) throws ResponseErrorException {
@@ -101,11 +108,12 @@ public abstract class CrudController<T extends BaseEntity<ID>, ID> {
         return null;
     }
 
-    protected Optional<UUID> getUUIDAuthenticated(){
-        String uuidStr = SecurityContextHolder.getContext().getAuthentication() != null
-                && SecurityContextHolder.getContext().getAuthentication().isAuthenticated()
-                ? SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString()
-                : null;
-        return uuidStr != null ? Optional.of(UUID.fromString(uuidStr)) : Optional.empty();
+    protected Optional<UUID> getUUIDAuthenticated(HttpServletRequest request){
+        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if(authorization != null && !authorization.isBlank() && authorization.startsWith(BEARER)){
+            return JWTUtil.getSubject(authorization.replace(BEARER, EMPYT), secret)
+                    .map(p -> Optional.of(UUID.fromString(p)))
+                    .orElse(Optional.empty());
+        } else return Optional.empty();
     }
 }

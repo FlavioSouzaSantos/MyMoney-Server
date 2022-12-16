@@ -7,7 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.UUID;
 
 @RestController
@@ -15,6 +15,6 @@ import java.util.UUID;
 public class AccountController extends CrudController<Account, Long> {
     @Override
     protected Specification<Account> createDefaultSpecification(HttpServletRequest request) {
-        return new FilterAccountByUserSpecification(getUUIDAuthenticated().orElse(UUID.randomUUID()));
+        return new FilterAccountByUserSpecification(getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
     }
 }

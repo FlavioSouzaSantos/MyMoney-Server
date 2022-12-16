@@ -4,8 +4,8 @@ import br.com.mymoney.cadastrationservice.models.listerners.BaseEntityListener;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

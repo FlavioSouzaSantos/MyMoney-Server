@@ -2,8 +2,8 @@ package br.com.mymoney.cadastrationservice.models.listerners;
 
 import br.com.mymoney.cadastrationservice.models.entities.BaseEntity;
 
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
