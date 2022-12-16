@@ -15,6 +15,6 @@ import java.util.UUID;
 public class AccountController extends CrudController<Account, Long> {
     @Override
     protected Specification<Account> createDefaultSpecification(HttpServletRequest request) {
-        return new FilterAccountByUserSpecification(getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
+        return new FilterAccountByUserSpecification(crudService.getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
     }
 }

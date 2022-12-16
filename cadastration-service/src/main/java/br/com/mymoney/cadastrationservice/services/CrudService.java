@@ -5,11 +5,14 @@ import br.com.mymoney.cadastrationservice.exceptions.ValidationException;
 import br.com.mymoney.cadastrationservice.models.dtos.ResponseErrorDto;
 import br.com.mymoney.cadastrationservice.models.dtos.ResponsePageDto;
 import br.com.mymoney.cadastrationservice.models.entities.BaseEntity;
+import br.com.mymoney.cadastrationservice.utils.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -27,8 +31,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+
+import static br.com.mymoney.cadastrationservice.filters.JWTAuthenticationFilter.BEARER;
+import static br.com.mymoney.cadastrationservice.filters.JWTAuthenticationFilter.EMPYT;
 
 @Log
 @RequiredArgsConstructor
@@ -38,20 +46,22 @@ public abstract class CrudService<T extends BaseEntity<ID>, ID> {
     @Autowired protected Validator validator;
     @Autowired protected ObjectMapper objectMapper;
     @Autowired protected MessageSource messageSource;
+    @Value("${security.jwt.secret:}")
+    protected String secret;
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Optional<T> create(Optional<T> entity) {
+    public Optional<T> create(Optional<T> entity, HttpServletRequest request) {
         if(entity.isPresent()){
-            setDefaultValues(entity);
+            setDefaultValues(entity, request);
             return Optional.ofNullable(repository.save(entity.get()));
         }else return Optional.empty();
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Optional<T> fullUpdate(Optional<T> entity, Optional<ID> id) {
+    public Optional<T> fullUpdate(Optional<T> entity, Optional<ID> id, HttpServletRequest request) {
         if(entity.isPresent() && id.isPresent() && repository.existsById(id.get())){
             entity.get().setId(id.get());
-            setDefaultValues(entity);
+            setDefaultValues(entity, request);
 
             DataBinder binder = new DataBinder(entity.get());
             BindingResult bindingResult = binder.getBindingResult();
@@ -70,11 +80,11 @@ public abstract class CrudService<T extends BaseEntity<ID>, ID> {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Optional<T> partialUpdate(InputStream jsonBody, Optional<ID> id) {
+    public Optional<T> partialUpdate(InputStream jsonBody, Optional<ID> id, HttpServletRequest request) {
         if(jsonBody != null && id.isPresent() && repository.existsById(id.get())){
             try{
                 Optional<T> tempEntity = repository.findById(id.get());
-                setDefaultValues(tempEntity);
+                setDefaultValues(tempEntity, request);
 
                 ObjectReader objectReader = objectMapper.readerForUpdating(tempEntity.get());
                 T entity = (T) objectReader.readValue(jsonBody);
@@ -141,7 +151,7 @@ public abstract class CrudService<T extends BaseEntity<ID>, ID> {
      * Seta os valores padrão na entidade antes de ser salva.
      * @param entity Entidade a ser salva
      */
-    protected void setDefaultValues(Optional<T> entity){}
+    protected void setDefaultValues(Optional<T> entity, HttpServletRequest request){}
 
     /**
      * Valida se a entidade pode ser excluída.
@@ -149,4 +159,13 @@ public abstract class CrudService<T extends BaseEntity<ID>, ID> {
      * @throws ValidationException
      */
     protected void validateDeleteEntity(Optional<T> entity) throws ValidationException {}
+
+    public Optional<UUID> getUUIDAuthenticated(HttpServletRequest request){
+        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if(authorization != null && !authorization.isBlank() && authorization.startsWith(BEARER)){
+            return JWTUtil.getSubject(authorization.replace(BEARER, EMPYT), secret)
+                    .map(p -> Optional.of(UUID.fromString(p)))
+                    .orElse(Optional.empty());
+        } else return Optional.empty();
+    }
 }

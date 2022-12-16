@@ -15,6 +15,6 @@ import java.util.UUID;
 public class TagController extends CrudController<Tag, Long> {
     @Override
     protected Specification<Tag> createDefaultSpecification(HttpServletRequest request) {
-        return new FilterTagsByUserSpecification(getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
+        return new FilterTagsByUserSpecification(crudService.getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
     }
 }

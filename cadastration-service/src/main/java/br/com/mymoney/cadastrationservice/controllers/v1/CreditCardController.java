@@ -15,6 +15,6 @@ import java.util.UUID;
 public class CreditCardController extends CrudController<CreditCard, Long> {
     @Override
     protected Specification<CreditCard> createDefaultSpecification(HttpServletRequest request) {
-        return new FilterCreditCardsByUserSpecification(getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
+        return new FilterCreditCardsByUserSpecification(crudService.getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
     }
 }

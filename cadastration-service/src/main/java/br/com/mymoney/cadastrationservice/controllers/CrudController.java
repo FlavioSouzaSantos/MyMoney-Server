@@ -5,15 +5,12 @@ import br.com.mymoney.cadastrationservice.models.dtos.ResponseErrorDto;
 import br.com.mymoney.cadastrationservice.models.dtos.ResponsePageDto;
 import br.com.mymoney.cadastrationservice.models.entities.BaseEntity;
 import br.com.mymoney.cadastrationservice.services.CrudService;
-import br.com.mymoney.cadastrationservice.utils.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -21,23 +18,17 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-
-import static br.com.mymoney.cadastrationservice.filters.JWTAuthenticationFilter.BEARER;
-import static br.com.mymoney.cadastrationservice.filters.JWTAuthenticationFilter.EMPYT;
 
 @Log
 public abstract class CrudController<T extends BaseEntity<ID>, ID> {
 
     @Autowired protected CrudService<T, ID> crudService;
     @Autowired protected MessageSource messageSource;
-    @Value("${security.jwt.secret:}")
-    protected String secret;
 
     @PostMapping
-    public ResponseEntity<T> create(@Valid @RequestBody T entity, BindingResult bindingResult) throws ResponseErrorException {
+    public ResponseEntity<T> create(@Valid @RequestBody T entity, BindingResult bindingResult, HttpServletRequest request) throws ResponseErrorException {
         if(bindingResult.hasErrors()){
              Set<ResponseErrorDto> errors = bindingResult.getFieldErrors().stream()
                     .map(ResponseErrorDto::new)
@@ -46,14 +37,14 @@ public abstract class CrudController<T extends BaseEntity<ID>, ID> {
              throw new ResponseErrorException(errors);
         }
 
-        return crudService.create(Optional.of(entity))
+        return crudService.create(Optional.of(entity), request)
                 .map(record -> ResponseEntity.ok(record))
                 .orElse(ResponseEntity.badRequest().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<T> fullUpdate(@RequestBody T entity, @PathVariable("id") ID id){
-        return crudService.fullUpdate(Optional.ofNullable(entity), Optional.of(id))
+    public ResponseEntity<T> fullUpdate(@RequestBody T entity, @PathVariable("id") ID id, HttpServletRequest request){
+        return crudService.fullUpdate(Optional.ofNullable(entity), Optional.of(id), request)
                 .map(record -> ResponseEntity.ok(record))
                 .orElse(ResponseEntity.badRequest().build());
     }
@@ -62,7 +53,7 @@ public abstract class CrudController<T extends BaseEntity<ID>, ID> {
     public ResponseEntity<T> partialUpdate(HttpServletRequest request,
                                     @PathVariable("id") ID id){
         try{
-            return crudService.partialUpdate(request.getInputStream(), Optional.of(id))
+            return crudService.partialUpdate(request.getInputStream(), Optional.of(id), request)
                     .map(record -> ResponseEntity.ok(record))
                     .orElse(ResponseEntity.badRequest().build());
         }catch (IOException ex){
@@ -106,14 +97,5 @@ public abstract class CrudController<T extends BaseEntity<ID>, ID> {
      */
     protected Specification<T> createDefaultSpecification(HttpServletRequest request){
         return null;
-    }
-
-    protected Optional<UUID> getUUIDAuthenticated(HttpServletRequest request){
-        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if(authorization != null && !authorization.isBlank() && authorization.startsWith(BEARER)){
-            return JWTUtil.getSubject(authorization.replace(BEARER, EMPYT), secret)
-                    .map(p -> Optional.of(UUID.fromString(p)))
-                    .orElse(Optional.empty());
-        } else return Optional.empty();
     }
 }

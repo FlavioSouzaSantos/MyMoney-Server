@@ -15,6 +15,6 @@ import java.util.UUID;
 public class CategoryController extends CrudController<Category, Long> {
     @Override
     protected Specification<Category> createDefaultSpecification(HttpServletRequest request) {
-        return new FilterCategoriesByUserSpecification(getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
+        return new FilterCategoriesByUserSpecification(crudService.getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
     }
 }

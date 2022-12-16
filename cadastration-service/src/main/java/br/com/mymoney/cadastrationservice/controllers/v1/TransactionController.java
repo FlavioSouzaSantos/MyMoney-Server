@@ -15,6 +15,6 @@ import java.util.UUID;
 public class TransactionController extends CrudController<Transaction, Long> {
     @Override
     protected Specification<Transaction> createDefaultSpecification(HttpServletRequest request) {
-        return new FilterTransactionsByUserSpecification(getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
+        return new FilterTransactionsByUserSpecification(crudService.getUUIDAuthenticated(request).orElse(UUID.randomUUID()));
     }
 }
