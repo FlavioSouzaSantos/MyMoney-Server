@@ -1,6 +1,6 @@
 package br.com.mymoney.cadastrationservice.filters;
 
-import br.com.mymoney.cadastrationservice.utils.JWTUtil;
+import br.com.mymoney.crudcommon.utils.JWTUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

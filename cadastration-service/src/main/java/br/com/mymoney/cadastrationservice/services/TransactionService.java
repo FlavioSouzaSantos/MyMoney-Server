@@ -1,6 +1,7 @@
 package br.com.mymoney.cadastrationservice.services;
 
 import br.com.mymoney.cadastrationservice.models.entities.Transaction;
+import br.com.mymoney.crudcommon.services.CrudService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 

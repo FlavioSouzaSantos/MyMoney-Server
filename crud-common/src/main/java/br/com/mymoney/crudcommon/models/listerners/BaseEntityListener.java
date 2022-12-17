@@ -1,15 +1,14 @@
-package br.com.mymoney.cadastrationservice.models.listerners;
+package br.com.mymoney.crudcommon.models.listerners;
 
-import br.com.mymoney.cadastrationservice.models.entities.BaseEntity;
-
+import br.com.mymoney.crudcommon.models.entities.BaseEntity;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.UUID;
 
 public class BaseEntityListener {
-
     @PrePersist
     @PreUpdate
     public void preSave(BaseEntity baseEntity){

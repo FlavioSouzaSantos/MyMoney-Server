@@ -1,8 +1,8 @@
-package br.com.mymoney.cadastrationservice.controllers;
+package br.com.mymoney.crudcommon.controllers;
 
-import br.com.mymoney.cadastrationservice.exceptions.ResponseErrorException;
-import br.com.mymoney.cadastrationservice.exceptions.ValidationException;
-import br.com.mymoney.cadastrationservice.models.dtos.ResponseErrorDto;
+import br.com.mymoney.crudcommon.exceptions.ResponseErrorException;
+import br.com.mymoney.crudcommon.exceptions.ValidationException;
+import br.com.mymoney.crudcommon.models.dtos.ResponseErrorDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.context.MessageSource;

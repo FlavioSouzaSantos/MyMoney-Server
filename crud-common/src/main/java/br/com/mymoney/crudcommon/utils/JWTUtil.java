@@ -1,4 +1,4 @@
-package br.com.mymoney.cadastrationservice.utils;
+package br.com.mymoney.crudcommon.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

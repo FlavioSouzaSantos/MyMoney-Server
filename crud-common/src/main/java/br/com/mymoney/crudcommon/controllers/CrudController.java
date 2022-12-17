@@ -1,10 +1,10 @@
-package br.com.mymoney.cadastrationservice.controllers;
+package br.com.mymoney.crudcommon.controllers;
 
-import br.com.mymoney.cadastrationservice.exceptions.ResponseErrorException;
-import br.com.mymoney.cadastrationservice.models.dtos.ResponseErrorDto;
-import br.com.mymoney.cadastrationservice.models.dtos.ResponsePageDto;
-import br.com.mymoney.cadastrationservice.models.entities.BaseEntity;
-import br.com.mymoney.cadastrationservice.services.CrudService;
+import br.com.mymoney.crudcommon.exceptions.ResponseErrorException;
+import br.com.mymoney.crudcommon.models.dtos.ResponseErrorDto;
+import br.com.mymoney.crudcommon.models.dtos.ResponsePageDto;
+import br.com.mymoney.crudcommon.models.entities.BaseEntity;
+import br.com.mymoney.crudcommon.services.CrudService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;

@@ -1,4 +1,4 @@
-package br.com.mymoney.cadastrationservice.models.dtos;
+package br.com.mymoney.crudcommon.models.dtos;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

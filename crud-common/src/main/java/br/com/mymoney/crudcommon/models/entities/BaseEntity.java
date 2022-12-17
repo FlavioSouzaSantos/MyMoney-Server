@@ -1,4 +1,4 @@
-package br.com.mymoney.cadastrationservice.models.entities;
+package br.com.mymoney.crudcommon.models.entities;
 
 import lombok.Getter;
 import lombok.Setter;

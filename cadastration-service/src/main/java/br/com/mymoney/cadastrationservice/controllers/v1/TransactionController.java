@@ -1,6 +1,6 @@
 package br.com.mymoney.cadastrationservice.controllers.v1;
 
-import br.com.mymoney.cadastrationservice.controllers.CrudController;
+import br.com.mymoney.crudcommon.controllers.CrudController;
 import br.com.mymoney.cadastrationservice.models.entities.Transaction;
 import br.com.mymoney.cadastrationservice.specifications.FilterTransactionsByUserSpecification;
 import org.springframework.data.jpa.domain.Specification;

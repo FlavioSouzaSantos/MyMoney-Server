@@ -1,6 +1,6 @@
-package br.com.mymoney.cadastrationservice.exceptions;
+package br.com.mymoney.crudcommon.exceptions;
 
-import br.com.mymoney.cadastrationservice.models.dtos.ResponseErrorDto;
+import br.com.mymoney.crudcommon.models.dtos.ResponseErrorDto;
 import lombok.Getter;
 
 import java.util.Set;

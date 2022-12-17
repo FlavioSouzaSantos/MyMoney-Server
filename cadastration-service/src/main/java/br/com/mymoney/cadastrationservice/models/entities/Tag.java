@@ -1,6 +1,7 @@
 package br.com.mymoney.cadastrationservice.models.entities;
 
-import br.com.mymoney.cadastrationservice.models.listerners.BaseEntityListener;
+import br.com.mymoney.crudcommon.models.entities.BaseEntity;
+import br.com.mymoney.crudcommon.models.listerners.BaseEntityListener;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;

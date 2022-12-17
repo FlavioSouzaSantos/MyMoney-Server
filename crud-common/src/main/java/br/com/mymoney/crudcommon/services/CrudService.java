@@ -1,11 +1,11 @@
-package br.com.mymoney.cadastrationservice.services;
+package br.com.mymoney.crudcommon.services;
 
-import br.com.mymoney.cadastrationservice.exceptions.ResponseErrorException;
-import br.com.mymoney.cadastrationservice.exceptions.ValidationException;
-import br.com.mymoney.cadastrationservice.models.dtos.ResponseErrorDto;
-import br.com.mymoney.cadastrationservice.models.dtos.ResponsePageDto;
-import br.com.mymoney.cadastrationservice.models.entities.BaseEntity;
-import br.com.mymoney.cadastrationservice.utils.JWTUtil;
+import br.com.mymoney.crudcommon.exceptions.ResponseErrorException;
+import br.com.mymoney.crudcommon.exceptions.ValidationException;
+import br.com.mymoney.crudcommon.models.dtos.ResponseErrorDto;
+import br.com.mymoney.crudcommon.models.dtos.ResponsePageDto;
+import br.com.mymoney.crudcommon.utils.JWTUtil;
+import br.com.mymoney.crudcommon.models.entities.BaseEntity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,12 +35,11 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import static br.com.mymoney.cadastrationservice.filters.JWTAuthenticationFilter.BEARER;
-import static br.com.mymoney.cadastrationservice.filters.JWTAuthenticationFilter.EMPYT;
-
 @Log
 @RequiredArgsConstructor
 public abstract class CrudService<T extends BaseEntity<ID>, ID> {
+    public static final String BEARER="Bearer";
+    public static final String EMPYT = "";
 
     @Autowired protected JpaRepository<T,ID> repository;
     @Autowired protected Validator validator;
