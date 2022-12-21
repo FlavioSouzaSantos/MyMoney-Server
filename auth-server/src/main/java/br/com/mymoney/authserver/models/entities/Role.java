@@ -2,6 +2,7 @@ package br.com.mymoney.authserver.models.entities;
 
 import br.com.mymoney.crudcommon.models.entities.BaseEntity;
 import br.com.mymoney.crudcommon.models.listerners.BaseEntityListener;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -40,4 +41,8 @@ public class Role extends BaseEntity<Integer> {
     private UUID uuid;
 
     private LocalDateTime lastUpdate;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    private Set<User> users;
 }

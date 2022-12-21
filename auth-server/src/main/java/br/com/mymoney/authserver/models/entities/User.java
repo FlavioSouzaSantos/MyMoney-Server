@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "user")
+@Table(name = "tb_user")
 @EntityListeners(BaseEntityListener.class)
 public class User extends BaseEntity<Long> {
     @Id
@@ -30,8 +30,12 @@ public class User extends BaseEntity<Long> {
 
     @NotBlank(message = "{validation.model.User.email.NotBlank}")
     @Email(message = "{validation.model.User.email.Invalid}")
-    @Column(length = 100, nullable = false)
+    @Column(length = 100, nullable = false, unique = true)
     private String email;
+
+    @NotBlank(message = "{validation.model.User.password.NotBlank}")
+    @Column(length = 300, nullable = false)
+    private String password;
 
     @NotBlank(message = "{validation.model.User.phoneNumber.NotBlank}")
     @Column(length = 14, nullable = false)
@@ -45,7 +49,7 @@ public class User extends BaseEntity<Long> {
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_user_role__user")),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_user_role__role")))
-    private Set<Permission> roles;
+    private Set<Role> roles;
 
     @Column(nullable = false, updatable = false)
     private UUID uuid;

@@ -24,7 +24,7 @@ public class JWTAuthenticationFilter implements Filter {
                 authorization.isBlank() ||
                 !authorization.startsWith(BEARER) ||
                 JWTUtil.isExpired(authorization.replace(BEARER, EMPYT), secret)){
-            ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_FORBIDDEN);
+            ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }else{
             chain.doFilter(request, response);
         }

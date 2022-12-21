@@ -19,12 +19,12 @@ spring:
     password: desenv
     hikari:
       maximum-pool-size: 5
-    jpa:
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQL95Dialect
+  jpa:
+    properties:
       hibernate:
-        ddl-auto: update
-  security:
-    jwt:
-      secret: x856@#$oIx754!!*&
+        dialect: org.hibernate.dialect.PostgreSQL95Dialect
+    hibernate:
+      ddl-auto: update
+security:
+  jwt:
+    secret: x856@#$oIx754!!*&

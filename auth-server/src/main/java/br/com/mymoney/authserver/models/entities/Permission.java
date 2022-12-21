@@ -2,6 +2,7 @@ package br.com.mymoney.authserver.models.entities;
 
 import br.com.mymoney.crudcommon.models.entities.BaseEntity;
 import br.com.mymoney.crudcommon.models.listerners.BaseEntityListener;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -40,4 +41,8 @@ public class Permission extends BaseEntity<Long> {
     private UUID uuid;
 
     private LocalDateTime lastUpdate;
+
+    @JsonIgnore
+    @ManyToMany(mappedBy = "permissions", fetch = FetchType.LAZY)
+    private Set<Role> roles;
 }
