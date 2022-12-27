@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails implements UserDetails {
@@ -15,6 +16,7 @@ public class CustomUserDetails implements UserDetails {
     private boolean actived;
 
     private boolean blocked;
+    private UUID uuid;
     private Set<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(User user){
@@ -22,6 +24,7 @@ public class CustomUserDetails implements UserDetails {
         password = user.getPassword();
         actived = user.isActived();
         blocked = user.isBlocked();
+        uuid = user.getUuid();
         authorities = user.getRoles().stream().map(p -> "ROLE_"+p.getName()).map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
     }
 
@@ -37,22 +40,26 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return blocked;
+        return !blocked;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
         return actived;
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 
     @Override

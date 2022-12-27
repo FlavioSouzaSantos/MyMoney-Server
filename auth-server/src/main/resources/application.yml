@@ -28,3 +28,4 @@ spring:
 security:
   jwt:
     secret: x856@#$oIx754!!*&
+    expiration: 1800
