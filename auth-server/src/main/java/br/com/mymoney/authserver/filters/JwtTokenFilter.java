@@ -39,7 +39,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     .orElse(null);
             if(uuid != null){
                 UserDetails userDetails = userService.loadUserByUuid(uuid);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }

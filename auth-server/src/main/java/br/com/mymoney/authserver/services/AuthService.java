@@ -14,6 +14,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class AuthService {
 
     private final UserService userService;
