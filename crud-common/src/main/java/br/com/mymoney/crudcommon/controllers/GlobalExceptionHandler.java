@@ -15,7 +15,7 @@ import java.util.logging.Level;
 
 @Log
 @RequiredArgsConstructor
-@ControllerAdvice(basePackages = "br.com.mymoney.*.controllers")
+@ControllerAdvice(basePackages = "br.com.mymoney")
 public class GlobalExceptionHandler {
 
     private final MessageSource messageSource;

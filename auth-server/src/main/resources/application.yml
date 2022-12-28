@@ -27,5 +27,5 @@ spring:
       ddl-auto: update
 security:
   jwt:
-    secret: x856@#$oIx754!!*&
+    secret: x856@#$oIx754!!*&-x856@#$oIx754!!*&
     expiration: 1800

@@ -3,6 +3,8 @@ package br.com.mymoney.authserver;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -34,7 +36,13 @@ public class Configuration implements WebMvcConfigurer {
         messageSource.setBasenames("classpath:/messages", "org.hibernate.validator.ValidationMessages", "ValidationMessages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setCacheSeconds(3600); //Atualiza a cache a cada uma hora
+        messageSource.setDefaultLocale(Locale.of("pt", "BR"));
         return messageSource;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Override

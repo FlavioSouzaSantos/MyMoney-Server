@@ -33,7 +33,7 @@ public class User extends BaseEntity<Long> {
     @Column(length = 100, nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "{validation.model.User.password.NotBlank}")
+    //@NotBlank(message = "{validation.model.User.password.NotBlank}")
     @Column(length = 300, nullable = false)
     private String password;
 
@@ -41,7 +41,7 @@ public class User extends BaseEntity<Long> {
     @Column(length = 14, nullable = false)
     private String phoneNumber;
 
-    private boolean actived;
+    private boolean actived=true;
 
     private boolean blocked;
 
@@ -55,4 +55,7 @@ public class User extends BaseEntity<Long> {
     private UUID uuid;
 
     private LocalDateTime lastUpdate;
+
+    @Transient
+    private String rawPassword;
 }

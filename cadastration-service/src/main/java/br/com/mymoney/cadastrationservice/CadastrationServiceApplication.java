@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Import;
 
 @EnableDiscoveryClient
 @Import(GlobalExceptionHandler.class)
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "br.com.mymoney")
 public class CadastrationServiceApplication {
 
     public static void main(String[] args) {
