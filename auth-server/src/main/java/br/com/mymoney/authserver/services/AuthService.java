@@ -22,6 +22,8 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 
+import static br.com.mymoney.authserver.AESUtil.decrypt;
+
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -37,10 +39,16 @@ public class AuthService {
     @Value("${security.jwt.expiration:1800}")
     private Integer expiration;
 
+
+    @Value("${security.aes.key:}")
+    private String aesKey;
+
     public TokenDto auth(AuthDto authDto) {
         try{
             CustomUserDetails userDetails = (CustomUserDetails) userService.loadUserByUsername(authDto.login());
-            if(!passwordEncoder.matches(authDto.password(), userDetails.getPassword())){
+
+            String rawPasswordDecrypted = decrypt(authDto.password(), aesKey);
+            if(!passwordEncoder.matches(rawPasswordDecrypted, userDetails.getPassword())){
                 throw new AuthException(messageSource.getMessage("error.login.or.password.invalid", null, null));
             }
             if(!userDetails.isEnabled() || !userDetails.isAccountNonExpired()){
@@ -56,8 +64,10 @@ public class AuthService {
             ZonedDateTime expirationTime = ZonedDateTime.now().plusSeconds(expiration);
             String token = createToken(userDetails, expirationTime);
             return new TokenDto(token, expirationTime);
-        }catch (UsernameNotFoundException ex){
-            throw new ValidationException(ex.getMessage());
+        }catch (Exception ex){
+            if(ex instanceof UsernameNotFoundException)
+                throw new ValidationException(ex.getMessage());
+            else throw new RuntimeException(ex);
         }
     }
 

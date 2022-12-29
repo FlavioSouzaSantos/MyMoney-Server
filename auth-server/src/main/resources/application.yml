@@ -1,5 +1,5 @@
 server:
-  port: ${random.int(9000,9100)}
+  port: ${random.int(8080,8081)}
 eureka:
   instance:
     hostname: localhost
@@ -29,3 +29,5 @@ security:
   jwt:
     secret: x856@#$oIx754!!*&-x856@#$oIx754!!*&
     expiration: 1800
+  aes:
+    key: x856@#$oIx754!!*

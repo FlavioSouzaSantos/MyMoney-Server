@@ -1,5 +1,6 @@
 package br.com.mymoney.authserver.services;
 
+import br.com.mymoney.authserver.AESUtil;
 import br.com.mymoney.authserver.exceptions.UseruuuidNotFoundException;
 import br.com.mymoney.authserver.models.entities.User;
 import br.com.mymoney.authserver.models.pojos.CustomUserDetails;
@@ -9,6 +10,7 @@ import br.com.mymoney.crudcommon.models.dtos.ResponseErrorDto;
 import br.com.mymoney.crudcommon.services.CrudService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,6 +18,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -26,6 +33,9 @@ public class UserService extends CrudService<User, Long> implements UserDetailsS
 
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${security.aes.key:}")
+    private String aesKey;
+
     @Override
     protected void setDefaultValues(Optional<User> entity, HttpServletRequest request) {
         if(entity.isPresent() && entity.get().getId() == null){
@@ -33,7 +43,13 @@ public class UserService extends CrudService<User, Long> implements UserDetailsS
                 throw new ResponseErrorException(Set.of(new ResponseErrorDto("password",
                         messageSource.getMessage("validation.model.User.password.NotBlank", null, null))));
             }
-            entity.get().setPassword(passwordEncoder.encode(entity.get().getRawPassword()));
+            try{
+                String rawPasswordDecripted = AESUtil.decrypt(entity.get().getRawPassword(), aesKey);
+                entity.get().setPassword(passwordEncoder.encode(rawPasswordDecripted));
+            }catch (NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException ex){
+                throw new ResponseErrorException(Set.of(new ResponseErrorDto("password",
+                        messageSource.getMessage("validation.model.User.password.NotValid", null, null))));
+            }
         }
     }
 
