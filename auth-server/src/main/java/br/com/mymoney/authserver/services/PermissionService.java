@@ -11,27 +11,37 @@ import br.com.mymoney.crudcommon.services.CrudService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.AntPathMatcher;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class PermissionService extends CrudService<Permission, Long> {
 
     private final UserRepository userRepository;
+    private final AntPathMatcher pathMatcher;
 
     public ResultCheckPermissionDto checkPermissionForUser(CheckPermissionDto dto, HttpServletRequest request) {
+        boolean hasPermission = false;
         Optional<UUID> userUUID = getUUIDAuthenticated(request);
         if(userUUID.isPresent()){
             Optional<User> user = userRepository.findFirstUserByUuid(userUUID.get());
-            if(user.isPresent() && user.get().getRoles().stream().map(Role::getName).anyMatch(p -> p.equals(dto.roleName()))){
-                long count = ((PermissionRepository) repository).countPermissionsTheRoleHas(dto.roleName(), dto.url(), dto.method());
-                if(count > 0L){
-                    return new ResultCheckPermissionDto(userUUID.get(), dto.url(), dto.method(), true);
+            if(user.isPresent()){
+                if(((PermissionRepository) repository).findAllUrl()
+                        .stream().anyMatch(p -> pathMatcher.match(p, dto.url()))){
+                    if(!user.get().getRoles().isEmpty() &&
+                            ((PermissionRepository) repository).findAllUrlByRolesAndMethod(user.get().getRoles().stream().map(Role::getName).collect(Collectors.toSet()), dto.method())
+                                    .stream().anyMatch(p -> pathMatcher.match(p, dto.url()))){
+                        hasPermission = true;
+                    }
+                }else{
+                    hasPermission = true;
                 }
             }
         }
-        return new ResultCheckPermissionDto(null, dto.url(), dto.method(), false);
+        return new ResultCheckPermissionDto(userUUID.orElse(null), dto.url(), dto.method(), hasPermission);
     }
 }
