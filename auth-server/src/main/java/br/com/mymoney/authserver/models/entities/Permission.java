@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -16,12 +17,14 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 
 @Entity
 @Table(name = "permission")
 @EntityListeners(BaseEntityListener.class)
 public class Permission extends BaseEntity<Long> {
 
+    @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "permission_sequence")
     @SequenceGenerator(name = "permission_sequence", sequenceName = "permission_sequence_seq_id")

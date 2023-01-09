@@ -2,23 +2,31 @@ package br.com.mymoney.authserver.models.entities;
 
 import br.com.mymoney.crudcommon.models.entities.BaseEntity;
 import br.com.mymoney.crudcommon.models.listerners.BaseEntityListener;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
+
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 
 @Entity
 @Table(name = "tb_user")
 @EntityListeners(BaseEntityListener.class)
 public class User extends BaseEntity<Long> {
+
+    @EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_sequence")
     @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence_seq_id")
@@ -33,7 +41,7 @@ public class User extends BaseEntity<Long> {
     @Column(length = 100, nullable = false, unique = true)
     private String email;
 
-    //@NotBlank(message = "{validation.model.User.password.NotBlank}")
+    @JsonIgnore
     @Column(length = 300, nullable = false)
     private String password;
 
@@ -56,6 +64,7 @@ public class User extends BaseEntity<Long> {
 
     private LocalDateTime lastUpdate;
 
+    @JsonProperty(access = WRITE_ONLY)
     @Transient
     private String rawPassword;
 }
