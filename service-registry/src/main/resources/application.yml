@@ -1,11 +1,9 @@
-server:
-  port: 9091
-eureka:
-  instance:
-    prefer-ip-address: true
-  client:
-    register-with-eureka: false
-    fetch-registry: false
-  server:
-    wait-time-in-ms-when-sync-empty: 3000
-    eviction-interval-timer-in-ms: 1000
+spring:
+  application:
+    name: serviceregistry
+  config:
+    import: configserver:http://localhost:8888
+  cloud:
+    config:
+      username: mymoney
+      password: admin
