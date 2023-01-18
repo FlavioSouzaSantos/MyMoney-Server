@@ -39,7 +39,7 @@ public class Configuration implements WebMvcConfigurer {
         messageSource.setBasenames("classpath:/messages", "org.hibernate.validator.ValidationMessages", "ValidationMessages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setCacheSeconds(3600); //Atualiza a cache a cada uma hora
-        messageSource.setDefaultLocale(Locale.of("pt", "BR"));
+        messageSource.setDefaultLocale(new Locale("pt", "BR"));
         return messageSource;
     }
 

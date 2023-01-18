@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-alpine
+FROM eclipse-temurin:17.0.5_8-jdk
 LABEL maintainer="Flávio de Souza Santos"
 WORKDIR /opt/app
 COPY target/*.jar .

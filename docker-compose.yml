@@ -1,0 +1,91 @@
+version: "3"
+services:
+  config-server:
+    build: ./config-server/
+    image: config-server:latest
+    environment:
+      APPLICATION_PROFILE: development
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512MB
+      restart_policy:
+        condition: on-failure
+    networks:
+      - microservices
+  service-registry:
+    build: ./service-registry/
+    image: service-registry:latest
+    environment:
+      APPLICATION_PROFILE: development
+    ports:
+      - "9091:9091"
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512MB
+      restart_policy:
+        condition: on-failure
+    networks:
+      - microservices
+    depends_on:
+      - config-server
+  api-gateway:
+    build: ./api-gateway/
+    image: api-gateway:latest
+    ports:
+      - "8080:80"
+    environment:
+      APPLICATION_PROFILE: development
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512MB
+      restart_policy:
+        condition: on-failure
+    networks:
+      - microservices
+    depends_on:
+      - service-registry
+  auth-server:
+    build: ./auth-server/
+    image: auth-server:latest
+    environment:
+      APPLICATION_PROFILE: development
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512MB
+      restart_policy:
+        condition: on-failure
+    networks:
+      - microservices
+    depends_on:
+      - service-registry
+  cadastration-service:
+    build: ./cadastration-service/
+    image: cadastration-service:latest
+    environment:
+      APPLICATION_PROFILE: development
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512MB
+      restart_policy:
+        condition: on-failure
+    networks:
+      - microservices
+    depends_on:
+      - service-registry
+networks:
+  microservices:
