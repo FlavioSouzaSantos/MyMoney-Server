@@ -3,6 +3,7 @@ package br.com.mymoney.configserver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -29,7 +30,8 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests().requestMatchers("/**").hasRole(role).and().httpBasic();
+        http.authorizeRequests().requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+                .anyRequest().hasRole(role).and().httpBasic();
         return http.build();
     }
 
